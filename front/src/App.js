@@ -3,33 +3,68 @@ import Item from './Item'
 import './PlayaList.css'
 import logo from './mojito.ico'
 
-const items = [
-  {
-    name: 'Tongs',
-    picture: '/images/tongs.jpg'
-  },
-  {
-    name: 'Ballon de plage',
-    picture: '/images/ballon.jpg'
-  },
-  {
-    name: 'Raquettes de plage',
-    picture: '/images/raquettes.jpg'
-  },
-  {
-    name: 'Bouée grenouille',
-    picture: '/images/bouee-grenouille.jpg'
-  },
-]
+// const items = [
+//   {
+//     name: 'Tongs',
+//     picture: '/images/tongs.jpg'
+//   },
+//   {
+//     name: 'Ballon de plage',
+//     picture: '/images/ballon.jpg'
+//   },
+//   {
+//     name: 'Raquettes de plage',
+//     picture: '/images/raquettes.jpg'
+//   },
+//   {
+//     name: 'Bouée grenouille',
+//     picture: '/images/bouee-grenouille.jpg'
+//   },
+// ]
 
 class App extends Component {
   state = {
     items: []
   }
 
-  handleSubmit = () => {
+componentDidMount () {
+  fetch('/api/items',{
+    method: 'GET',
+  })
+  .then(res => res.json())
+  .then(items => {
+    this.setState({ items: items })
+  })
+}
 
-  }
+handleSubmit = (e) => {
+  e.preventDefault()
+  // const { name, picture } = this.state
+  const name = this.state.name
+  const picture = this.state.picture
+  fetch('/api/items', {
+    method: 'POST',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify({
+      name: name,
+      picture: picture
+    })
+  })
+  .then(res => res.json())
+  .then( items => {
+    console.log(items)
+  })
+}
+
+handleChange = (e) => {
+  const value = e.target.value
+  const name = e.target.name
+  this.setState({
+    [name]: value
+  })
+}
 
   render() {
     return (
@@ -40,27 +75,28 @@ class App extends Component {
           <h1 className="PlayaList-title">PlayaList</h1>
         </header>
 
-        {/*<div className="PlayaList-list">
-          <form>
+        <div className="PlayaList-list">
+        {
+          this.state.items.length !== 0 &&
+          this.state.items.map(item => {
+            return <Item item={item} key={item} />  
+          })
+        }
+          <form onSubmit={this.handleSubmit}>
             <h5>Ajouter un item</h5>
             <div>
-              <input name="name" placeholder="Nom" />
-              <input name="picture" placeholder="image" />
+              <input name="name" onChange={this.handleChange} placeholder="Nom" />
+              <input name="picture" onChange={this.handleChange} placeholder="image" />
               <button type="submit">
                 <span className="icon-checkmark"></span>
               </button>
             </div>
           </form>
-        </div>*/}
-
-        <div className="PlayaList-list">
-          <Item item={items[0]} />
-          <Item item={items[1]} />
-          <Item item={items[2]} />
-          <Item item={items[3]} />
         </div>
 
-      </div>
+       
+
+       </div>
     )
   }
 }
